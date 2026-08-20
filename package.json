@@ -1,0 +1,19 @@
+{
+  "name": "projet-echecs",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Jeu d'échecs - architecture en couches (domain / app / ui).",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "tailwindcss": "^4.3.3",
+    "vite": "^8.2.1",
+    "vitest": "^4.1.10"
+  }
+}
