@@ -1,6 +1,6 @@
 # Jeu d'échecs
 
-Projet de 2ᵉ année CFC. L'objectif du module est la **qualité de l'architecture** - voir `ARCHITECTURE.md`.
+Projet de 3ᵉ année CFC
 
 Jeu jouable à deux dans le navigateur, avec un moteur de règles indépendant de l'affichage.
 
