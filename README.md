@@ -1,13 +1,21 @@
 # Jeu d'échecs
 
-Projet de 3ᵉ année CFC
+Projet de 3ᵉ année CFC — module FrontEnd (CPNV).
 
 Jeu jouable à deux dans le navigateur, avec un moteur de règles indépendant de l'affichage.
+
+## Auteurs
+
+- **Samuel Theytaz** — moteur : génération des coups légaux (`domain/movement/`, `moveGenerator.js`)
+- **Timmy Marendaz** — règles de fin de partie et notation (`rules.js`, `domain/notation/`)
+- **Dani Derdovic** — interface et déroulement de la partie (`ui/`, `app/`)
+
+Classe : SI-C3a
 
 ## Démarrer
 
 ```bash
-npm install -D vite vitest tailwindcss @tailwindcss/vite
+npm install      # installe les dépendances
 npm run dev      # serveur de développement
 npm run test     # tests (Vitest)
 npm run build    # build de production
