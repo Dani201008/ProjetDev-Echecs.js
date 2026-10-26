@@ -33,20 +33,20 @@ export function mountChessUi(game) {
     </main>
   `
 
-    // le chronomètre est recréé à chaque nouvelle partie ou reset, donc on le garde dans une
-    // variable "let" plutôt que dans une constante
     let timer = null
     let unsubscribeTimer = null
 
     const board = createBoardView((move) => {
-        // on note qui joue AVANT le coup, car après game.play() le trait change de camp
         const playerWhoMoved = game.position.sideToMove
         const moveWasPlayed = game.play(move)
         if (moveWasPlayed) {
             timer.pressButton(playerWhoMoved)
         }
     })
-    const status = createStatusView()
+
+    // le bouton "Rejouer" du gros message de fin de partie fait la même chose que
+    // le bouton "Nouvelle partie" du menu : startNewGame(), définie plus bas
+    const status = createStatusView(startNewGame)
 
     const boardWrapper = document.querySelector('#board')
     boardWrapper.append(board.element)
@@ -54,18 +54,16 @@ export function mountChessUi(game) {
     document.querySelector('#black-player').append(status.blackElement)
     document.querySelector('#white-player').append(status.whiteElement)
 
+    // le gros message de fin de partie est posé à la racine de la page (pas dans le plateau),
+    // car il est en position "fixed" : il se centre tout seul par rapport à l'écran entier
+    app.append(status.overlayElement)
+
     const pauseButton = document.querySelector('#pause-timer')
 
-    // Redessine le plateau. Ne doit être appelé que quand la position a changé
-    // (un coup joué, une nouvelle partie), jamais à chaque tic du chrono : sinon
-    // les 64 cases sont détruites et recréées 10 fois par seconde, ce qui fait
-    // clignoter le plateau et rend les clics difficiles à capter.
     function renderBoard() {
         board.render(game.position, game.legalMoves())
     }
 
-    // Met à jour la pendule et le message de partie. Ça, on peut l'appeler
-    // aussi souvent qu'on veut : ce sont juste deux petites div, pas tout le plateau.
     function renderStatus() {
         status.render(game, timer)
         pauseButton.textContent = timer.isRunning ? 'Mettre en pause' : 'Reprendre le chrono'
@@ -74,6 +72,12 @@ export function mountChessUi(game) {
     function renderEverything() {
         renderBoard()
         renderStatus()
+
+        // la partie vient peut-être de se terminer (mat, pat ou nulle) : on arrête la pendule,
+        // peu importe le résultat
+        if (game.isOver()) {
+            timer.stop()
+        }
     }
 
     // Crée un nouveau chronomètre à 10 minutes et le démarre.
@@ -87,19 +91,18 @@ export function mountChessUi(game) {
         timer.start()
     }
 
-    const menu = document.querySelector('#menu')
-    document.querySelector('#menu-button').onclick = () => { menu.hidden = !menu.hidden }
-
-    document.querySelector('#new-game').onclick = () => {
+    // Remet la partie et le chrono à zéro. Utilisé par le bouton "Nouvelle partie" du menu
+    // ET par le bouton "Rejouer" qui apparaît sur le gros message de fin de partie.
+    function startNewGame() {
         game.reset()
         startNewTimer()
     }
 
-    document.querySelector('#flip-board').onclick = () => board.flip()
-
-    document.querySelector('#reset-timer').onclick = () => {
-        startNewTimer()
-    }
+    const menu = document.querySelector('#menu')
+    document.querySelector('#menu-button').onclick = () => { menu.hidden = !menu.hidden }
+    document.querySelector('#new-game').onclick = startNewGame
+    document.querySelector('#flip-board').onclick = board.flip
+    document.querySelector('#reset-timer').onclick = startNewTimer
 
     pauseButton.onclick = () => {
         if (timer.isRunning) {

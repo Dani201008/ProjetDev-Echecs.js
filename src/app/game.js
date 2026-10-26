@@ -8,30 +8,37 @@
  */
 import { startingPosition, applyMove, pieceAt } from '../domain/position.js'
 import { legalMoves as domainLegalMoves } from '../domain/moveGenerator.js'
-import { getGameStatus } from '../domain/rules.js'
+import { getGameStatus, GameStatus } from '../domain/rules.js'
 import { createSquare } from '../domain/square.js'
 import { MoveFlag } from '../domain/move.js'
+
+// Tous les états qui veulent dire que la partie est terminée (mat, pat, ou une des nulles)
+const ENDING_STATUSES = [
+  GameStatus.CHECKMATE,
+  GameStatus.STALEMATE,
+  GameStatus.DRAW_INSUFFICIENT_MATERIAL,
+  GameStatus.DRAW_FIFTY_MOVE,
+  GameStatus.DRAW_THREEFOLD_REPETITION,
+]
 
 // Vérifie si un coup que l'on veut jouer correspond bien à un coup légal renvoyé par le domaine.
 // On compare la case de départ, la case d'arrivée, et la pièce de promotion si il y en a une.
 function sameMove(legalMove, playedMove) {
-  if (legalMove.from.file !== playedMove.from.file) return false
-  if (legalMove.from.rank !== playedMove.from.rank) return false
-  if (legalMove.to.file !== playedMove.to.file) return false
-  if (legalMove.to.rank !== playedMove.to.rank) return false
+  const sameSquares = legalMove.from.file === playedMove.from.file
+      && legalMove.from.rank === playedMove.from.rank
+      && legalMove.to.file === playedMove.to.file
+      && legalMove.to.rank === playedMove.to.rank
 
-  if (playedMove.promotion) {
-    return legalMove.promotion === playedMove.promotion
-  }
-  return legalMove.promotion === null
+  const samePromotion = playedMove.promotion
+      ? legalMove.promotion === playedMove.promotion
+      : legalMove.promotion === null
+
+  return sameSquares && samePromotion
 }
 
 // Fait une copie des pièces capturées, pour pouvoir les remettre si on annule un coup (undo)
 function cloneCaptured(captured) {
-  return {
-    white: captured.white.slice(),
-    black: captured.black.slice(),
-  }
+  return { white: captured.white.slice(), black: captured.black.slice() }
 }
 
 export class Game {
@@ -48,18 +55,19 @@ export class Game {
     this.notify()
   }
 
-  // Renvoie la liste de tous les coups légaux possibles dans la position actuelle
   legalMoves() {
     return domainLegalMoves(this.position)
   }
 
-  // Renvoie l'état actuel de la partie : 'ongoing', 'check', 'checkmate', 'stalemate',
-  // ou une des valeurs de nulle. C'est domain/rules.js qui fait tout le travail,
-  // on lui donne juste la position actuelle et l'historique des positions précédentes
-  // (nécessaire pour détecter la triple répétition).
+  // État actuel de la partie ('ongoing', 'check', 'checkmate'...), calculé par domain/rules.js
   status() {
     const previousPositions = this.history.map((state) => state.position)
     return getGameStatus(this.position, previousPositions)
+  }
+
+  // La partie est-elle terminée (peu importe le résultat) ?
+  isOver() {
+    return ENDING_STATUSES.includes(this.status())
   }
 
   // Essaie de jouer un coup. Renvoie true si le coup a été joué, false s'il n'est pas légal.
@@ -69,7 +77,6 @@ export class Game {
 
     const capturedPiece = this.capturedBy(legalMove)
 
-    // avant de modifier la partie, on garde une copie de l'état actuel pour pouvoir revenir en arrière
     this.history.push({
       position: this.position,
       captured: cloneCaptured(this.captured),

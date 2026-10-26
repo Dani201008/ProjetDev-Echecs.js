@@ -8,25 +8,10 @@
  */
 
 const SYMBOLS = {
-    white: {
-        p: '♙',
-        n: '♘',
-        b: '♗',
-        r: '♖',
-        q: '♕',
-        k: '♔',
-    },
-    black: {
-        p: '♟',
-        n: '♞',
-        b: '♝',
-        r: '♜',
-        q: '♛',
-        k: '♚',
-    },
+    white: { p: '♙', n: '♘', b: '♗', r: '♖', q: '♕', k: '♔' },
+    black: { p: '♟', n: '♞', b: '♝', r: '♜', q: '♛', k: '♚' },
 }
 
-// Renvoie le caractère à afficher pour une pièce { type, color } donnée
 export function pieceSymbol(piece) {
     return SYMBOLS[piece.color][piece.type]
 }

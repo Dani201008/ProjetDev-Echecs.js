@@ -30,7 +30,6 @@ export function createBoardView(onMove) {
     let selected = null // la case sélectionnée : { file, rank }, ou null si rien n'est sélectionné
     let flipped = false
 
-    // Renvoie tous les coups légaux qui partent de la case sélectionnée
     function movesFromSelected() {
         if (selected === null) return []
         return moves.filter((m) => m.from.file === selected.file && m.from.rank === selected.rank)
@@ -45,15 +44,10 @@ export function createBoardView(onMove) {
         // Si plusieurs coups légaux visent la même case, c'est une promotion :
         // le domaine propose un coup par pièce possible (dame, tour, fou, cavalier).
         // On choisit automatiquement la dame, qui est presque toujours le meilleur choix.
-        for (const m of matchingMoves) {
-            if (m.promotion === PieceType.QUEEN || m.promotion === null) {
-                return m
-            }
-        }
-        return matchingMoves[0]
+        const queenMove = matchingMoves.find((m) => m.promotion === PieceType.QUEEN || m.promotion === null)
+        return queenMove || matchingMoves[0]
     }
 
-    // Redessine complètement le plateau
     function draw() {
         element.innerHTML = ''
         if (position === null) return
@@ -66,22 +60,17 @@ export function createBoardView(onMove) {
                 const piece = pieceAt(position, createSquare(file, rank))
 
                 // une case sur deux est foncée, comme sur un vrai échiquier
-                let backgroundColor = 'bg-[#e8b979]'
-                if ((file + rank) % 2 === 0) {
-                    backgroundColor = 'bg-[#8c4b25]'
-                }
+                const backgroundColor = (file + rank) % 2 === 0 ? 'bg-[#8c4b25]' : 'bg-[#e8b979]'
 
                 // la couleur du texte dépend de la couleur de la pièce, pas de la couleur de la case
                 let pieceColor = ''
-                if (piece !== null) {
-                    if (piece.color === Color.WHITE) {
-                        pieceColor = 'text-[#fff3d2] [text-shadow:1px_2px_#7c5939]'
-                    } else {
-                        pieceColor = 'text-[#241b18] [text-shadow:1px_2px_#9e785f]'
-                    }
+                if (piece) {
+                    pieceColor = piece.color === Color.WHITE
+                        ? 'text-[#fff3d2] [text-shadow:1px_2px_#7c5939]'
+                        : 'text-[#241b18] [text-shadow:1px_2px_#9e785f]'
                 }
 
-                square.className = 'relative grid h-full min-h-0 w-full min-w-0 place-items-center overflow-hidden border-0 font-serif text-[clamp(1.8rem,6vw,4.5rem)] leading-none transition hover:brightness-110 ' + backgroundColor + ' ' + pieceColor
+                square.className = `relative grid h-full min-h-0 w-full min-w-0 place-items-center overflow-hidden border-0 font-serif text-[clamp(1.8rem,6vw,4.5rem)] leading-none transition hover:brightness-110 ${backgroundColor} ${pieceColor}`
 
                 // contour jaune sur la case actuellement sélectionnée
                 if (selected !== null && selected.file === file && selected.rank === rank) {
@@ -93,7 +82,7 @@ export function createBoardView(onMove) {
                     square.classList.add('after:absolute', 'after:h-1/4', 'after:w-1/4', 'after:rounded-full', 'after:bg-[#315c2d]/80')
                 }
 
-                if (piece !== null) {
+                if (piece) {
                     square.textContent = pieceSymbol(piece)
                 }
 
@@ -103,7 +92,6 @@ export function createBoardView(onMove) {
         }
     }
 
-    // Gère un clic sur la case (file, rank)
     function handleClick(file, rank) {
         const move = moveTo(file, rank)
         if (move !== null) {
@@ -115,13 +103,8 @@ export function createBoardView(onMove) {
 
         // sinon, on regarde si on peut sélectionner la pièce sur laquelle on vient de cliquer
         const piece = pieceAt(position, createSquare(file, rank))
-        const pieceHasMoves = moves.some((m) => m.from.file === file && m.from.rank === rank)
-
-        if (piece !== null && pieceHasMoves) {
-            selected = { file: file, rank: rank }
-        } else {
-            selected = null
-        }
+        const canSelect = piece && moves.some((m) => m.from.file === file && m.from.rank === rank)
+        selected = canSelect ? { file, rank } : null
         draw()
     }
 
