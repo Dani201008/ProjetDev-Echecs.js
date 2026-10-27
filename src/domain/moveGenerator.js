@@ -27,7 +27,7 @@ function pseudoLegalMoves(position) {
 }
 
 // Coups de roque du camp au trait
-// placé ici prcq'il faut savoir si des cases sont attaquées, ce que king.js ne peut pas voir
+// placé ici parce qu'il faut savoir si des cases sont attaquées, ce que king.js ne peut pas voir
 function castlingMoves(position) {
   const color = position.sideToMove
   const enemy = opposite(color)
@@ -121,7 +121,7 @@ function kingSquare(position, color) {
   return null
 }
 
-// Garde seulement les coups qui ne laissent pas le en échec
+// Garde seulement les coups qui ne laissent pas le roi en échec
 // chaque coup est appliqué et on vérifie que le roi est pas attaqué dans la position qu'on obtient
 export function legalMoves(position) {
   const me = position.sideToMove
@@ -129,12 +129,4 @@ export function legalMoves(position) {
     const after = applyMove(position, move)
     return !isSquareAttacked(after, kingSquare(after, me), opposite(me))
   })
-}
-
-// Teste si un coup précis est légal en comparant ses cases à celles des coups légaux
-export function isLegal(position, move) {
-  return legalMoves(position).some(
-    (m) => m.from.file === move.from.file && m.from.rank === move.from.rank
-        && m.to.file === move.to.file && m.to.rank === move.to.rank,
-  )
 }

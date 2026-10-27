@@ -12,7 +12,7 @@ import { PieceType } from '../piece.js'
 
 const PROMOTIONS = [PieceType.QUEEN, PieceType.ROOK, PieceType.BISHOP, PieceType.KNIGHT]
 
-// Coups pseudo-légaux du pion depuis from, parcontre le sens de marche dépend de sa couleur
+// Coups pseudo-légaux du pion depuis from, le sens de marche dépend de sa couleur
 export function pseudoLegalMoves(position, from) {
   const me = pieceAt(position, from)
   const dir = me.color === Color.WHITE ? 1 : -1
