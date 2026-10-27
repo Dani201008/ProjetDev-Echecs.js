@@ -95,7 +95,8 @@ function nextCastling(castling, piece, move) {
 }
 
 // Rend la position immuable pour éviter des modifications accidentelle
-function freeze(position) {
+// exportée pour que notation/fen.js fige aussi les positions qu'il lit
+export function freeze(position) {
   position.board.forEach((row) => Object.freeze(row))
   Object.freeze(position.board)
   return Object.freeze(position)

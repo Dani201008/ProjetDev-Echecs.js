@@ -6,8 +6,8 @@ Jeu jouable à deux dans le navigateur, avec un moteur de règles indépendant d
 
 ## Auteurs
 
-- **Samuel Theytaz** — moteur : génération des coups légaux (`domain/movement/`, `moveGenerator.js`)
-- **Timmy Marendaz** — règles de fin de partie et notation (`rules.js`, `domain/notation/`)
+- **Samuel Theytaz** — moteur : génération des coups légaux (`domain/movement/`, `moveGenerator.js`), notation FEN / SAN / PGN (`domain/notation/`) et sauvegarde (`persistence/`)
+- **Timmy Marendaz** — règles de fin de partie : échec, mat, pat et nulles (`rules.js`)
 - **Dani Derdovic** — interface et déroulement de la partie (`ui/`, `app/`)
 
 Classe : SI-C3a

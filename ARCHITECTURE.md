@@ -62,7 +62,7 @@ src/
       index.js  ray.js  pawn.js  knight.js  bishop.js  rook.js  queen.js  king.js
     moveGenerator.js       pseudo-légal -> légal (+ roque / e.p. / promotion)
     rules.js               échec, mat, pat, matériel insuffisant
-    notation/  fen.js  san.js  pgn.js
+    notation/              fen.js (position <-> texte)  san.js (un coup)  pgn.js (une partie)
   app/
     game.js                historique + coups légaux + undo/redo + abonnement
   ui/
@@ -70,7 +70,7 @@ src/
     statusView.js          trait, échec, résultat
     pieces.js              glyphes des pièces
   persistence/
-    storage.js             sauvegarde / chargement (FEN/PGN) - optionnel
+    storage.js             sauvegarde / chargement en PGN (localStorage)
 tests/                     domain, movement, moveGenerator, rules, notation, perft
 ```
 
@@ -82,8 +82,8 @@ Le cœur est pur : il se teste sans navigateur, avec Vitest. Tests unitaires par
 
 On fige d'abord ensemble les formes de `Position` et `Move`, puis :
 
-- Membre 1 - domain : position, pièces, movement, moveGenerator.
-- Membre 2 - domain : roque / e.p. / promotion, échec/mat/pat, notation (fen/san/pgn).
+- Membre 1 - domain : position, pièces, movement, moveGenerator (roque / e.p. / promotion compris), notation (fen/san/pgn) ; persistence : sauvegarde.
+- Membre 2 - domain : échec/mat/pat et nulles (rules).
 - Membre 3 - app + ui : game, affichage, intégration.
 
 Git : `main` protégée, une branche par module, revues croisées.

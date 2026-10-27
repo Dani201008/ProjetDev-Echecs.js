@@ -7,6 +7,7 @@ import { createBoardView } from './ui/boardView.js'
 import { createStatusView } from './ui/statusView.js'
 import { Game } from './app/game.js'
 import { ChessTimer } from './app/timer.js'
+import { saveGame, loadGame } from './persistence/storage.js'
 
 const MINUTES_PER_PLAYER = 10
 
@@ -23,6 +24,8 @@ export function mountChessUi(game) {
       <button id="flip-board" class="text-left text-[#fff0cf]">Retourner le plateau</button>
       <button id="reset-timer" class="text-left text-[#fff0cf]">Réinitialiser le timer</button>
       <button id="pause-timer" class="text-left text-[#fff0cf]">Mettre en pause</button>
+      <button id="save-game" class="text-left text-[#fff0cf]">Sauvegarder la partie</button>
+      <button id="load-game" class="text-left text-[#fff0cf]">Charger la partie</button>
     </nav>
     <main class="mx-auto mt-8 grid max-w-6xl grid-cols-1 items-center justify-items-center gap-5 md:mt-10 md:grid-cols-[auto_auto_auto] md:gap-10">
       <div id="black-player"></div>
@@ -110,6 +113,23 @@ export function mountChessUi(game) {
         } else {
             timer.start()
         }
+    }
+
+    document.querySelector('#save-game').onclick = () => {
+        saveGame(game)
+        menu.hidden = true
+    }
+
+    // la partie est rejouée coup par coup, puis on repart avec une pendule neuve
+    document.querySelector('#load-game').onclick = () => {
+        if (!loadGame(game)) return
+        startNewTimer()
+        // la pendule démarre toujours avec les blancs : si c'est aux noirs de jouer, on leur passe la main
+        if (game.position.sideToMove !== timer.getActiveColor()) {
+            timer.pressButton(timer.getActiveColor())
+        }
+        renderEverything()
+        menu.hidden = true
     }
 
     game.subscribe(renderEverything)
