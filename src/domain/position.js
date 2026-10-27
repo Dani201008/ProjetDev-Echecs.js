@@ -55,7 +55,7 @@ export function applyMove(position, move) {
   if (move.flag === MoveFlag.EN_PASSANT) {
     board[move.from.rank][move.to.file] = null
   }
-  // au rock il reste à déplacer la tour, le roi a déjà bougé au-dessus
+  // au roque il reste à déplacer la tour, le roi a déjà bougé au-dessus
   if (move.flag === MoveFlag.CASTLE_KING) {
     board[move.from.rank][5] = board[move.from.rank][7]
     board[move.from.rank][7] = null
@@ -94,7 +94,7 @@ function nextCastling(castling, piece, move) {
   return c
 }
 
-// Rend la position immuable pour éviter des modifications accidentelle
+// Rend la position immuable pour éviter des modifications accidentelles
 // exportée pour que notation/fen.js fige aussi les positions qu'il lit
 export function freeze(position) {
   position.board.forEach((row) => Object.freeze(row))
